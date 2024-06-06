@@ -1,20 +1,31 @@
 import { useState } from "react";
 import toast from 'react-hot-toast';
+import { useAuthContext } from "../context/AuthContext";
 
 const useSignup = () => {
   const [loading, setLoading] = useState(false);
+  const {setAuthUser} = useAuthContext()
 
-  const signup = async({fullName, username, password, confirmPassword, gender}) => {
-    const success =  handleInputErrors({fullName, username, password, confirmPassword, gender})
+  const signup = async({fullname, username, password, confirmPassword, gender}) => {
+    const success =  handleInputErrors({fullname, username, password, confirmPassword, gender})
     if(!success) return;
     setLoading(true);
     try{
-        const res = await fetch("http://localhost:3000/authen/signup", {
+        const res = await fetch("http://localhost:5000/authen/signup", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({fullName, username, password, confirmPassword, gender})
+            body: JSON.stringify({fullname, username, password, confirmPassword, gender})
         })
         const data = await res.json();
+        if(res.ok){
+            localStorage.setItem('token', data.token);
+            toast.success('Signup successfull');
+        }
+        if(data.error){
+            throw new Error(data.error);
+        }
+        localStorage.setItem("chat-user", JSON.stringify(data));
+        setAuthUser(data);
         console.log(data);
     }catch(error){
         toast.error(error.message)
@@ -26,8 +37,8 @@ const useSignup = () => {
 }
 
 export default useSignup;
-function handleInputErrors({fullName, username, password, confirmPassword, gender}){
-    if(!fullName || !username || !password || !confirmPassword || !gender){
+function handleInputErrors({fullname, username, password, confirmPassword, gender}){
+    if(!fullname || !username || !password || !confirmPassword || !gender){
         toast.error('Please fill in all fields')
         return false;
     }

@@ -49,18 +49,20 @@ export const signup = async(req, res) =>{
             username,
             password: hashedPassword,
             gender,
-            profilePic: gender == "male" ? boyProfilePic : girlProfilePic
+            profilePic: gender === "male" ? boyProfilePic : girlProfilePic
         });
 
         await newUser.save();
+        const token = generateToken(newUser._id);
         if(newUser){
-            await generateTokenAndSetCookie();
+            generateTokenAndSetCookie(newUser, res);
            res.status(201).json({
                 _id: newUser._id,
                 fullname: newUser.fullname,
                 username: newUser.username,
                 profilePic: newUser.profilePic,
-                gender: newUser.gender
+                gender: newUser.gender,
+                token: token
             });
         }
     }catch(error){

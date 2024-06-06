@@ -4,6 +4,8 @@ import protectRoute from './protectRoute.js';
 
 const Router = express.Router();
 
-Router.get("/", protectRoute, getUsersForSidebars);
+// Router.get("/", protectRoute, getUsersForSidebars);
+Router.get("/", getUsersForSidebars);
+
 
 export default Router;
